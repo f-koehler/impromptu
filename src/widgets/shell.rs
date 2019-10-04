@@ -48,23 +48,29 @@ pub fn get_shell_jobs(arg: &str) -> Vec<ShellJob> {
     result
 }
 
-pub fn get_shell_name() -> String {
-    let pid = nix::unistd::getppid().as_raw();
-    match std::fs::File::open(format!("/proc/{}/cmdline", pid)) {
-        Err(_err) => "unknown".to_string(),
-        Ok(mut file) => {
-            let mut buf = String::new();
-            match file.read_to_string(&mut buf) {
-                Err(_err) => "unknown".to_string(),
-                Ok(_ok) => String::from(buf),
+cached! {
+    SHELL_NAME;
+    fn get_shell_name() -> String = {
+        let pid = nix::unistd::getppid().as_raw();
+        match std::fs::File::open(format!("/proc/{}/cmdline", pid)) {
+            Err(_err) => "unknown".to_string(),
+            Ok(mut file) => {
+                let mut buf = String::new();
+                match file.read_to_string(&mut buf) {
+                    Err(_err) => "unknown".to_string(),
+                    Ok(_ok) => String::from(buf),
+                }
             }
         }
     }
 }
 
-pub fn get_cwd() -> PathBuf {
-    match std::env::current_dir() {
-        Err(_err) => PathBuf::from("<unknown>"),
-        Ok(path) => path,
+cached! {
+    CWD;
+    fn get_cwd() -> PathBuf = {
+        match std::env::current_dir() {
+            Err(_err) => PathBuf::from("<unknown>"),
+            Ok(path) => path,
+        }
     }
 }
