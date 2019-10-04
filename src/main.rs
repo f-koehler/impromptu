@@ -8,12 +8,14 @@ extern crate termion;
 #[macro_use]
 extern crate cached;
 
+pub mod style;
 pub mod widgets;
+
+use style::*;
 
 use clap::{App, Arg};
 use std::path::PathBuf;
 use std::string::String;
-use termion::{color, style};
 
 struct TerminalSize {
     ws_row: nix::libc::c_ushort,
@@ -73,13 +75,13 @@ fn main() {
         Ok(retval) => retval,
     };
     let retval_symbol = match retval {
-        0 => format!("{}✓{}", color::Fg(color::Green), color::Fg(color::Reset)),
-        _ => format!("{}✗{}", color::Fg(color::Red), color::Fg(color::Reset)),
+        0 => green("✓"),
+        _ => red("✗"),
     };
 
     let job_symbol = match widgets::shell::get_shell_jobs(args.value_of("JOBS").unwrap()).len() {
         0 => format!(""),
-        _ => format!(" {}⚙{}", color::Fg(color::Cyan), color::Fg(color::Reset)),
+        _ => cyan("⚙"),
     };
 
     let (width, height) = get_terminal_size();
@@ -98,63 +100,28 @@ fn main() {
         Ok(stripped) => PathBuf::from("~").join(stripped),
     };
 
-    let cwd_text = format!(
-        "{}{}{}{}{}",
-        style::Bold,
-        color::Fg(color::Red),
-        cwd.display(),
-        color::Fg(color::Reset),
-        style::Reset
-    );
+    let cwd_text = bold(red(cwd.display()));
 
     let mut git_text = String::new();
     match widgets::git::get_git_repo(widgets::shell::get_cwd()) {
         None => (),
         Some(repo) => {
             let status = widgets::git::handle_git_repo(&repo);
-            git_text = format!(
-                "{}(git:{}){}",
-                color::Fg(color::Green),
-                status.description,
-                color::Fg(color::Reset)
-            )
-            .to_string();
+            git_text = green(format!("(git:{})", status.description));
         }
     }
 
     let prompt_symbol = match widgets::user::is_root() {
-        true => format!(
-            "{}{}#{}{}",
-            style::Bold,
-            color::Fg(color::Red),
-            color::Fg(color::Reset),
-            style::Reset
-        ),
-        false => format!(
-            "{}{}${}{}",
-            style::Bold,
-            color::Fg(color::Green),
-            color::Fg(color::Reset),
-            style::Reset
-        ),
+        true => bold(red("#")),
+        false => bold(green("$")),
     };
 
+    println!("{}", yellow(format!("{} {} {}", shell, line, time)));
     println!(
-        "{}{} {} {}{}",
-        color::Fg(color::Yellow),
-        shell,
-        line,
-        time,
-        color::Fg(color::Reset)
-    );
-    println!(
-        "{}{} {}{}@{}{}:{} {} {}",
+        "{} {} {}{} {} {}",
         retval_symbol,
         job_symbol,
-        color::Fg(color::Green),
-        passwd.username,
-        color::Fg(color::Green),
-        hostname,
+        green(format!("{}@{}:", passwd.username, hostname)),
         cwd_text,
         git_text,
         prompt_symbol
