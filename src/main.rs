@@ -5,6 +5,8 @@ extern crate git2;
 extern crate lazy_static;
 extern crate nix;
 extern crate termion;
+#[macro_use]
+extern crate cached;
 
 use clap::{App, Arg};
 use regex::Regex;
@@ -60,47 +62,55 @@ fn get_shell_jobs(arg: &str) -> Vec<ShellJob> {
     result
 }
 
-struct WinSize {
+struct TerminalSize {
     ws_row: nix::libc::c_ushort,
     ws_col: nix::libc::c_ushort,
     ws_xpixel: nix::libc::c_ushort,
     ws_ypixel: nix::libc::c_ushort,
 }
 
-fn get_terminal_size() -> (u16, u16) {
-    unsafe {
-        let mut winsize = WinSize {
-            ws_row: 0,
-            ws_col: 0,
-            ws_xpixel: 0,
-            ws_ypixel: 0,
-        };
+cached! {
+    TERMINAL_SIZE;
 
-        match nix::libc::ioctl(
-            nix::libc::STDOUT_FILENO,
-            nix::libc::TIOCGWINSZ,
-            &mut winsize,
-        ) {
-            -1 => return (0u16, 0u16),
-            _ => {
-                return (
-                    std::cmp::max(0, winsize.ws_col) as u16,
-                    std::cmp::max(0, winsize.ws_row),
-                )
+    fn get_terminal_size() -> (u16, u16) = {
+        unsafe {
+            let mut winsize = TerminalSize {
+                ws_row: 0,
+                ws_col: 0,
+                ws_xpixel: 0,
+                ws_ypixel: 0,
+            };
+
+            match nix::libc::ioctl(
+                nix::libc::STDOUT_FILENO,
+                nix::libc::TIOCGWINSZ,
+                &mut winsize,
+            ) {
+                -1 => return (0u16, 0u16),
+                _ => {
+                    return (
+                        std::cmp::max(0, winsize.ws_col) as u16,
+                        std::cmp::max(0, winsize.ws_row),
+                    )
+                }
             }
         }
     }
 }
 
-fn get_shell_name() -> String {
-    let pid = nix::unistd::getppid().as_raw();
-    match std::fs::File::open(format!("/proc/{}/cmdline", pid)) {
-        Err(_err) => "unknown".to_string(),
-        Ok(mut file) => {
-            let mut buf = String::new();
-            match file.read_to_string(&mut buf) {
-                Err(_err) => "unknown".to_string(),
-                Ok(_ok) => String::from(buf),
+cached! {
+    SHELL_NAME;
+
+    fn get_shell_name() -> String = {
+        let pid = nix::unistd::getppid().as_raw();
+        match std::fs::File::open(format!("/proc/{}/cmdline", pid)) {
+            Err(_err) => "unknown".to_string(),
+            Ok(mut file) => {
+                let mut buf = String::new();
+                match file.read_to_string(&mut buf) {
+                    Err(_err) => "unknown".to_string(),
+                    Ok(_ok) => String::from(buf),
+                }
             }
         }
     }
@@ -134,16 +144,20 @@ fn is_root() -> bool {
     nix::unistd::geteuid().is_root()
 }
 
-fn get_hostname() -> String {
-    let buffer_size = match nix::unistd::sysconf(nix::unistd::SysconfVar::HOST_NAME_MAX).unwrap() {
-        Some(len) => len as usize,
-        None => 128 as usize,
-    };
-    let mut buf: Vec<u8> = Vec::with_capacity(buffer_size);
-    buf.resize(buffer_size, 0u8);
-    match nix::unistd::gethostname(buf.as_mut()) {
-        Err(_err) => "unknown".to_string(),
-        Ok(hostname) => hostname.to_string_lossy().into_owned(),
+cached! {
+    HOSTNAME;
+
+    fn get_hostname() -> String = {
+        let buffer_size = match nix::unistd::sysconf(nix::unistd::SysconfVar::HOST_NAME_MAX).unwrap() {
+            Some(len) => len as usize,
+            None => 128 as usize,
+        };
+        let mut buf: Vec<u8> = Vec::with_capacity(buffer_size);
+        buf.resize(buffer_size, 0u8);
+        match nix::unistd::gethostname(buf.as_mut()) {
+            Err(_err) => "unknown".to_string(),
+            Ok(hostname) => hostname.to_string_lossy().into_owned(),
+        }
     }
 }
 
@@ -207,6 +221,17 @@ fn handle_git_repo(repo: &git2::Repository) -> GitStatus {
     result
 }
 
+cached! {
+    CWD;
+
+    fn get_cwd() -> PathBuf = {
+        match std::env::current_dir() {
+            Err(_err) => PathBuf::from("<unknown>"),
+            Ok(path) => path,
+        }
+    }
+}
+
 fn main() {
     let args = App::new("impromptu")
         .version("0.1")
@@ -249,12 +274,9 @@ fn main() {
     let hostname = get_hostname();
 
     let passwd = get_passwd();
-    let cwd = match std::env::current_dir() {
-        Err(_err) => PathBuf::from("unknown"),
-        Ok(path) => match path.strip_prefix(passwd.home_directory) {
-            Err(_err) => path,
-            Ok(stripped) => PathBuf::from("~").join(stripped),
-        },
+    let cwd = match get_cwd().strip_prefix(passwd.home_directory) {
+        Err(_err) => get_cwd(),
+        Ok(stripped) => PathBuf::from("~").join(stripped),
     };
 
     let cwd_text = format!(
@@ -267,7 +289,7 @@ fn main() {
     );
 
     let mut git_text = String::new();
-    match get_git_repo(std::env::current_dir().ok().unwrap()) {
+    match get_git_repo(get_cwd()) {
         None => (),
         Some(repo) => {
             let status = handle_git_repo(&repo);
