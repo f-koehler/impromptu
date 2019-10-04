@@ -192,9 +192,11 @@ fn handle_git_repo(repo: &git2::Repository) -> GitStatus {
 
     let mut describe_options = git2::DescribeOptions::new();
     describe_options.describe_all();
+    let mut describe_fmt_options = git2::DescribeFormatOptions::new();
+    describe_fmt_options.dirty_suffix("⚡");
     match repo.describe(&describe_options) {
         Err(_err) => result.description = "Ø".to_string(),
-        Ok(description) => match description.format(None) {
+        Ok(description) => match description.format(Some(&describe_fmt_options)) {
             Err(_err) => result.description = "unknw".to_string(),
             Ok(text) => result.description = text,
         },
