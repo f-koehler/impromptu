@@ -49,4 +49,17 @@ fn main() {
         bg_light_white(" white "),
         bg_light_yellow(" yellow "),
     );
+
+    for r in 0..6 {
+        for g in 0..6 {
+            for b in 0..6 {
+                print!("{} ", termion::color::AnsiValue::rgb(r, g, b).bg_string(),);
+            }
+        }
+    }
+    println!("\n");
+    for g in 0..24 {
+        print!("{} ", termion::color::AnsiValue::grayscale(g).bg_string());
+    }
+    println!("\n");
 }
