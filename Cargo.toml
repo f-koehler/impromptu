@@ -24,3 +24,11 @@ panic = 'abort'
 [[bench]]
 name = "benchmarks"
 harness = false
+
+[[bin]]
+name = "impromptu"
+path = "src/main.rs"
+
+[[bin]]
+name = "impromptu-colors"
+path = "src/main-colors.rs"

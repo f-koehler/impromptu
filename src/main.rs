@@ -53,7 +53,7 @@ fn main() {
     let time = format!("{}", chrono::Local::now().format("%H:%M:%S"));
     let shell = widgets::shell::get_shell_name();
     let line = std::iter::repeat("─")
-        .take(width as usize - time.len() - shell.len() - 1)
+        .take(width as usize - time.len() - shell.len() - 3)
         .collect::<String>();
 
     let hostname = widgets::hostname::get_hostname();
