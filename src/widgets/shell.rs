@@ -1,4 +1,6 @@
-use regex::{Captures, Regex};
+extern crate regex;
+
+use self::regex::{Captures, Regex};
 use std::io::Read;
 use std::path::PathBuf;
 

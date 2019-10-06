@@ -45,7 +45,7 @@ fn main() {
 
     let job_symbol = match widgets::shell::get_shell_jobs(args.value_of("JOBS").unwrap()).len() {
         0 => format!(""),
-        _ => cyan("⚙"),
+        _ => cyan("⚙ "),
     };
 
     let (width, height) = widgets::terminal::get_terminal_size();
@@ -71,7 +71,41 @@ fn main() {
         None => (),
         Some(repo) => {
             let status = widgets::git::handle_git_repo(&repo);
-            git_text = green(format!("(git:{})", status.description));
+
+            if status.number_new > 0 {
+                git_text = format!("{}{}", git_text, green(format!(" ★{}", status.number_new)));
+            }
+
+            if status.number_deleted > 0 {
+                git_text = format!(
+                    "{}{}",
+                    git_text,
+                    red(format!(" 🗑{}", status.number_deleted))
+                );
+            }
+
+            if status.number_modified > 0 {
+                git_text = format!(
+                    "{}{}",
+                    git_text,
+                    yellow(format!(" 📝{}", status.number_modified))
+                );
+            }
+
+            if status.number_conflicts > 0 {
+                git_text = format!(
+                    "{}{}",
+                    git_text,
+                    cyan(format!(" ⚡{}", status.number_conflicts))
+                );
+            }
+
+            git_text = format!(
+                "{}{}{}",
+                green(format!("(git:{}", status.description)),
+                git_text,
+                green(")")
+            );
         }
     }
 
@@ -82,7 +116,7 @@ fn main() {
 
     println!("{}", yellow(format!("{} {} {}", shell, line, time)));
     println!(
-        "{} {} {}{} {} {}",
+        "{} {}{}{} {} {}",
         retval_symbol,
         job_symbol,
         green(format!("{}@{}:", passwd.username, hostname)),
