@@ -10,6 +10,7 @@ extern crate cached;
 
 pub mod git;
 pub mod hostname;
+pub mod python;
 pub mod shell;
 pub mod style;
 pub mod terminal;
@@ -120,11 +121,17 @@ fn main() {
         false => bold(green("$")),
     };
 
+    let python_text = match python::get_virtual_env_name() {
+        None => String::new(),
+        Some(venv) => format!("[py: {}] ", venv),
+    };
+
     println!("{}", yellow(format!("{} {} {}", shell, line, time)));
     print!(
-        "{} {}{}{} {} {}",
+        "{} {}{}{}{} {} {}",
         retval_symbol,
         job_symbol,
+        python_text,
         green(format!("{}@{}:", passwd.username, hostname)),
         cwd_text,
         git_text,
