@@ -8,8 +8,12 @@ extern crate termion;
 #[macro_use]
 extern crate cached;
 
+pub mod git;
+pub mod hostname;
+pub mod shell;
 pub mod style;
-pub mod widgets;
+pub mod terminal;
+pub mod user;
 
 use style::*;
 
@@ -42,15 +46,15 @@ fn main() {
         _ => red("✗"),
     };
 
-    let job_symbol = match widgets::shell::get_shell_jobs(args.value_of("JOBS").unwrap()).len() {
+    let job_symbol = match shell::get_shell_jobs(args.value_of("JOBS").unwrap()).len() {
         0 => format!(""),
         _ => cyan("⚙ "),
     };
 
-    let (width, _) = widgets::terminal::get_terminal_size();
+    let (width, _) = terminal::get_terminal_size();
 
     let time = format!("{}", chrono::Local::now().format("%H:%M:%S"));
-    let shell = widgets::shell::get_shell_name();
+    let shell = shell::get_shell_name();
     let line = match width {
         0u16 => "".to_string(),
         _ => std::iter::repeat("─")
@@ -58,21 +62,21 @@ fn main() {
             .collect::<String>(),
     };
 
-    let hostname = widgets::hostname::get_hostname();
+    let hostname = hostname::get_hostname();
 
-    let passwd = widgets::user::get_passwd();
+    let passwd = user::get_passwd();
 
-    let cwd_text = bold(red(widgets::shell::shorten_path(
-        widgets::shell::get_cwd(),
+    let cwd_text = bold(red(shell::shorten_path(
+        shell::get_cwd(),
         passwd.home_directory,
     )
     .display()));
 
     let mut git_text = String::new();
-    match widgets::git::get_git_repo(widgets::shell::get_cwd()) {
+    match git::get_git_repo(shell::get_cwd()) {
         None => (),
         Some(repo) => {
-            let status = widgets::git::handle_git_repo(&repo);
+            let status = git::handle_git_repo(&repo);
 
             if status.number_new > 0 {
                 git_text = format!("{}{}", git_text, green(format!(" ★{}", status.number_new)));
@@ -111,7 +115,7 @@ fn main() {
         }
     }
 
-    let prompt_symbol = match widgets::user::is_root() {
+    let prompt_symbol = match user::is_root() {
         true => bold(red("#")),
         false => bold(green("$")),
     };
