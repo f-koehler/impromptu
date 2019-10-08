@@ -76,3 +76,16 @@ cached! {
         }
     }
 }
+
+pub fn shorten_path(path: PathBuf, home_path: PathBuf) -> PathBuf {
+    match path.strip_prefix(home_path) {
+        Err(_) => path,
+        Ok(stripped) => match stripped.to_str() {
+            None => path,
+            Some(converted) => match converted.trim().is_empty() {
+                true => PathBuf::from("~"),
+                false => PathBuf::from("~").join(stripped),
+            },
+        },
+    }
+}

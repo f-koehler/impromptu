@@ -14,7 +14,6 @@ pub mod widgets;
 use style::*;
 
 use clap::{App, Arg};
-use std::path::PathBuf;
 use std::string::String;
 
 fn main() {
@@ -55,19 +54,19 @@ fn main() {
     let line = match width {
         0u16 => "".to_string(),
         _ => std::iter::repeat("─")
-            .take(width as usize - time.len() - shell.len() - 3)
+            .take(width as usize - time.len() - shell.len() - 1)
             .collect::<String>(),
     };
 
     let hostname = widgets::hostname::get_hostname();
 
     let passwd = widgets::user::get_passwd();
-    let cwd = match widgets::shell::get_cwd().strip_prefix(passwd.home_directory) {
-        Err(_err) => widgets::shell::get_cwd(),
-        Ok(stripped) => PathBuf::from("~").join(stripped),
-    };
 
-    let cwd_text = bold(red(cwd.display()));
+    let cwd_text = bold(red(widgets::shell::shorten_path(
+        widgets::shell::get_cwd(),
+        passwd.home_directory,
+    )
+    .display()));
 
     let mut git_text = String::new();
     match widgets::git::get_git_repo(widgets::shell::get_cwd()) {
