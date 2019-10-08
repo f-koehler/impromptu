@@ -48,13 +48,16 @@ fn main() {
         _ => cyan("⚙ "),
     };
 
-    let (width, height) = widgets::terminal::get_terminal_size();
+    let (width, _) = widgets::terminal::get_terminal_size();
 
     let time = format!("{}", chrono::Local::now().format("%H:%M:%S"));
     let shell = widgets::shell::get_shell_name();
-    let line = std::iter::repeat("─")
-        .take(width as usize - time.len() - shell.len() - 3)
-        .collect::<String>();
+    let line = match width {
+        0u16 => "".to_string(),
+        _ => std::iter::repeat("─")
+            .take(width as usize - time.len() - shell.len() - 3)
+            .collect::<String>(),
+    };
 
     let hostname = widgets::hostname::get_hostname();
 
@@ -115,7 +118,7 @@ fn main() {
     };
 
     println!("{}", yellow(format!("{} {} {}", shell, line, time)));
-    println!(
+    print!(
         "{} {}{}{} {} {}",
         retval_symbol,
         job_symbol,
