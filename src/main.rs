@@ -4,7 +4,6 @@ extern crate git2;
 #[macro_use]
 extern crate lazy_static;
 extern crate nix;
-extern crate termion;
 #[macro_use]
 extern crate cached;
 
@@ -16,6 +15,8 @@ pub mod style;
 pub mod terminal;
 pub mod user;
 
+use style::Color::*;
+use style::Style::*;
 use style::*;
 
 use clap::{App, Arg};
@@ -43,13 +44,13 @@ fn main() {
         Ok(retval) => retval,
     };
     let retval_symbol = match retval {
-        0 => green("✓"),
-        _ => red("✗"),
+        0 => colored("✓", Green),
+        _ => colored("✗", Red),
     };
 
     let job_symbol = match shell::get_shell_jobs(args.value_of("JOBS").unwrap()).len() {
         0 => format!(""),
-        _ => cyan("⚙ "),
+        _ => colored("⚙ ", Cyan),
     };
 
     let (width, _) = terminal::get_terminal_size();
@@ -67,11 +68,13 @@ fn main() {
 
     let passwd = user::get_passwd();
 
-    let cwd_text = bold(red(shell::shorten_path(
-        shell::get_cwd(),
-        passwd.home_directory,
-    )
-    .display()));
+    let cwd_text = styled(
+        colored(
+            shell::shorten_path(shell::get_cwd(), passwd.home_directory).display(),
+            Red,
+        ),
+        Bold,
+    );
 
     let mut git_text = String::new();
     match git::get_git_repo(shell::get_cwd()) {
@@ -80,14 +83,18 @@ fn main() {
             let status = git::handle_git_repo(&repo);
 
             if status.number_new > 0 {
-                git_text = format!("{}{}", git_text, green(format!(" ★{}", status.number_new)));
+                git_text = format!(
+                    "{}{}",
+                    git_text,
+                    colored(format!(" ★{}", status.number_new), Green)
+                );
             }
 
             if status.number_deleted > 0 {
                 git_text = format!(
                     "{}{}",
                     git_text,
-                    red(format!(" 🗑{}", status.number_deleted))
+                    colored(format!(" 🗑{}", status.number_deleted), Red)
                 );
             }
 
@@ -95,7 +102,7 @@ fn main() {
                 git_text = format!(
                     "{}{}",
                     git_text,
-                    yellow(format!(" 📝{}", status.number_modified))
+                    colored(format!(" 📝{}", status.number_modified), Yellow)
                 );
             }
 
@@ -103,22 +110,22 @@ fn main() {
                 git_text = format!(
                     "{}{}",
                     git_text,
-                    cyan(format!(" ⚡{}", status.number_conflicts))
+                    colored(format!(" ⚡{}", status.number_conflicts), Cyan)
                 );
             }
 
             git_text = format!(
                 "{}{}{}",
-                green(format!("(git:{}", status.description)),
+                colored(format!("(git:{}", status.description), Green),
                 git_text,
-                green(")")
+                colored(")", Green)
             );
         }
     }
 
     let prompt_symbol = match user::is_root() {
-        true => bold(red("#")),
-        false => bold(green("$")),
+        true => styled(colored("#", Red), Bold),
+        false => styled(colored("$", Green), Bold),
     };
 
     let python_text = match python::get_virtual_env_name() {
@@ -126,13 +133,16 @@ fn main() {
         Some(venv) => format!("[py: {}] ", venv),
     };
 
-    println!("{}", yellow(format!("{} {} {}", shell, line, time)));
+    println!(
+        "{}",
+        colored(format!("{} {} {}", shell, line, time), Yellow)
+    );
     print!(
         "{} {}{}{}{} {} {}",
         retval_symbol,
         job_symbol,
         python_text,
-        green(format!("{}@{}:", passwd.username, hostname)),
+        colored(format!("{}@{}:", passwd.username, hostname), Green),
         cwd_text,
         git_text,
         prompt_symbol

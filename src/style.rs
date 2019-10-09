@@ -1,161 +1,254 @@
-pub fn colored<T: std::fmt::Display, C: termion::color::Color>(arg: T, col: C) -> String {
-    format!(
-        "{}{}{}",
-        termion::color::Fg(col),
-        arg,
-        termion::color::Fg(termion::color::Reset)
-    )
+pub enum Color {
+    Black,
+    Red,
+    Green,
+    Yellow,
+    Blue,
+    Magenta,
+    Cyan,
+    White,
+    LightBlack,
+    LightRed,
+    LightGreen,
+    LightYellow,
+    LightBlue,
+    LightMagenta,
+    LightCyan,
+    LightWhite,
 }
 
-pub fn bg_colored<T: std::fmt::Display, C: termion::color::Color>(arg: T, col: C) -> String {
-    format!(
-        "{}{}{}",
-        termion::color::Bg(col),
-        arg,
-        termion::color::Bg(termion::color::Reset)
-    )
+pub enum Style {
+    Bold,
+    Faint,
+    Italic,
+    Underline,
+    Blink,
+    Invert,
+    CrossedOut,
+    Framed,
 }
 
-pub fn black<T: std::fmt::Display>(arg: T) -> String {
-    colored(arg, termion::color::Black)
+pub fn colored<T: std::fmt::Display>(arg: T, color: Color) -> String {
+    match color {
+        Color::Black => format!(
+            "{}{}{}",
+            termion::color::Fg(termion::color::Black),
+            arg,
+            termion::color::Fg(termion::color::Reset)
+        ),
+        Color::Red => format!(
+            "{}{}{}",
+            termion::color::Fg(termion::color::Red),
+            arg,
+            termion::color::Fg(termion::color::Reset)
+        ),
+        Color::Green => format!(
+            "{}{}{}",
+            termion::color::Fg(termion::color::Green),
+            arg,
+            termion::color::Fg(termion::color::Reset)
+        ),
+        Color::Yellow => format!(
+            "{}{}{}",
+            termion::color::Fg(termion::color::Yellow),
+            arg,
+            termion::color::Fg(termion::color::Reset)
+        ),
+        Color::Blue => format!(
+            "{}{}{}",
+            termion::color::Fg(termion::color::Blue),
+            arg,
+            termion::color::Fg(termion::color::Reset)
+        ),
+        Color::Magenta => format!(
+            "{}{}{}",
+            termion::color::Fg(termion::color::Magenta),
+            arg,
+            termion::color::Fg(termion::color::Reset)
+        ),
+        Color::Cyan => format!(
+            "{}{}{}",
+            termion::color::Fg(termion::color::Cyan),
+            arg,
+            termion::color::Fg(termion::color::Reset)
+        ),
+        Color::White => format!(
+            "{}{}{}",
+            termion::color::Fg(termion::color::White),
+            arg,
+            termion::color::Fg(termion::color::Reset)
+        ),
+        Color::LightBlack => format!(
+            "{}{}{}",
+            termion::color::Fg(termion::color::LightBlack),
+            arg,
+            termion::color::Fg(termion::color::Reset)
+        ),
+        Color::LightRed => format!(
+            "{}{}{}",
+            termion::color::Fg(termion::color::LightRed),
+            arg,
+            termion::color::Fg(termion::color::Reset)
+        ),
+        Color::LightGreen => format!(
+            "{}{}{}",
+            termion::color::Fg(termion::color::LightGreen),
+            arg,
+            termion::color::Fg(termion::color::Reset)
+        ),
+        Color::LightYellow => format!(
+            "{}{}{}",
+            termion::color::Fg(termion::color::LightYellow),
+            arg,
+            termion::color::Fg(termion::color::Reset)
+        ),
+        Color::LightBlue => format!(
+            "{}{}{}",
+            termion::color::Fg(termion::color::LightBlue),
+            arg,
+            termion::color::Fg(termion::color::Reset)
+        ),
+        Color::LightMagenta => format!(
+            "{}{}{}",
+            termion::color::Fg(termion::color::LightMagenta),
+            arg,
+            termion::color::Fg(termion::color::Reset)
+        ),
+        Color::LightCyan => format!(
+            "{}{}{}",
+            termion::color::Fg(termion::color::LightCyan),
+            arg,
+            termion::color::Fg(termion::color::Reset)
+        ),
+        Color::LightWhite => format!(
+            "{}{}{}",
+            termion::color::Fg(termion::color::LightWhite),
+            arg,
+            termion::color::Fg(termion::color::Reset)
+        ),
+    }
 }
 
-pub fn blue<T: std::fmt::Display>(arg: T) -> String {
-    colored(arg, termion::color::Blue)
+pub fn bg_colored<T: std::fmt::Display>(arg: T, color: Color) -> String {
+    match color {
+        Color::Black => format!(
+            "{}{}{}",
+            termion::color::Bg(termion::color::Black),
+            arg,
+            termion::color::Bg(termion::color::Reset)
+        ),
+        Color::Red => format!(
+            "{}{}{}",
+            termion::color::Bg(termion::color::Red),
+            arg,
+            termion::color::Bg(termion::color::Reset)
+        ),
+        Color::Green => format!(
+            "{}{}{}",
+            termion::color::Bg(termion::color::Green),
+            arg,
+            termion::color::Bg(termion::color::Reset)
+        ),
+        Color::Yellow => format!(
+            "{}{}{}",
+            termion::color::Bg(termion::color::Yellow),
+            arg,
+            termion::color::Bg(termion::color::Reset)
+        ),
+        Color::Blue => format!(
+            "{}{}{}",
+            termion::color::Bg(termion::color::Blue),
+            arg,
+            termion::color::Bg(termion::color::Reset)
+        ),
+        Color::Magenta => format!(
+            "{}{}{}",
+            termion::color::Bg(termion::color::Magenta),
+            arg,
+            termion::color::Bg(termion::color::Reset)
+        ),
+        Color::Cyan => format!(
+            "{}{}{}",
+            termion::color::Bg(termion::color::Cyan),
+            arg,
+            termion::color::Bg(termion::color::Reset)
+        ),
+        Color::White => format!(
+            "{}{}{}",
+            termion::color::Bg(termion::color::White),
+            arg,
+            termion::color::Bg(termion::color::Reset)
+        ),
+        Color::LightBlack => format!(
+            "{}{}{}",
+            termion::color::Bg(termion::color::LightBlack),
+            arg,
+            termion::color::Bg(termion::color::Reset)
+        ),
+        Color::LightRed => format!(
+            "{}{}{}",
+            termion::color::Bg(termion::color::LightRed),
+            arg,
+            termion::color::Bg(termion::color::Reset)
+        ),
+        Color::LightGreen => format!(
+            "{}{}{}",
+            termion::color::Bg(termion::color::LightGreen),
+            arg,
+            termion::color::Bg(termion::color::Reset)
+        ),
+        Color::LightYellow => format!(
+            "{}{}{}",
+            termion::color::Bg(termion::color::LightYellow),
+            arg,
+            termion::color::Bg(termion::color::Reset)
+        ),
+        Color::LightBlue => format!(
+            "{}{}{}",
+            termion::color::Bg(termion::color::LightBlue),
+            arg,
+            termion::color::Bg(termion::color::Reset)
+        ),
+        Color::LightMagenta => format!(
+            "{}{}{}",
+            termion::color::Bg(termion::color::LightMagenta),
+            arg,
+            termion::color::Bg(termion::color::Reset)
+        ),
+        Color::LightCyan => format!(
+            "{}{}{}",
+            termion::color::Bg(termion::color::LightCyan),
+            arg,
+            termion::color::Bg(termion::color::Reset)
+        ),
+        Color::LightWhite => format!(
+            "{}{}{}",
+            termion::color::Bg(termion::color::LightWhite),
+            arg,
+            termion::color::Bg(termion::color::Reset)
+        ),
+    }
 }
 
-pub fn cyan<T: std::fmt::Display>(arg: T) -> String {
-    colored(arg, termion::color::Cyan)
-}
-
-pub fn green<T: std::fmt::Display>(arg: T) -> String {
-    colored(arg, termion::color::Green)
-}
-
-pub fn light_black<T: std::fmt::Display>(arg: T) -> String {
-    colored(arg, termion::color::LightBlack)
-}
-
-pub fn light_blue<T: std::fmt::Display>(arg: T) -> String {
-    colored(arg, termion::color::LightBlue)
-}
-
-pub fn light_cyan<T: std::fmt::Display>(arg: T) -> String {
-    colored(arg, termion::color::LightCyan)
-}
-
-pub fn light_green<T: std::fmt::Display>(arg: T) -> String {
-    colored(arg, termion::color::LightGreen)
-}
-
-pub fn light_magenta<T: std::fmt::Display>(arg: T) -> String {
-    colored(arg, termion::color::LightMagenta)
-}
-
-pub fn light_red<T: std::fmt::Display>(arg: T) -> String {
-    colored(arg, termion::color::LightRed)
-}
-
-pub fn light_white<T: std::fmt::Display>(arg: T) -> String {
-    colored(arg, termion::color::LightWhite)
-}
-
-pub fn light_yellow<T: std::fmt::Display>(arg: T) -> String {
-    colored(arg, termion::color::LightYellow)
-}
-
-pub fn magenta<T: std::fmt::Display>(arg: T) -> String {
-    colored(arg, termion::color::Magenta)
-}
-
-pub fn red<T: std::fmt::Display>(arg: T) -> String {
-    colored(arg, termion::color::Red)
-}
-
-pub fn white<T: std::fmt::Display>(arg: T) -> String {
-    colored(arg, termion::color::White)
-}
-
-pub fn yellow<T: std::fmt::Display>(arg: T) -> String {
-    colored(arg, termion::color::Yellow)
-}
-
-pub fn bg_black<T: std::fmt::Display>(arg: T) -> String {
-    bg_colored(arg, termion::color::Black)
-}
-
-pub fn bg_blue<T: std::fmt::Display>(arg: T) -> String {
-    bg_colored(arg, termion::color::Blue)
-}
-
-pub fn bg_cyan<T: std::fmt::Display>(arg: T) -> String {
-    bg_colored(arg, termion::color::Cyan)
-}
-
-pub fn bg_green<T: std::fmt::Display>(arg: T) -> String {
-    bg_colored(arg, termion::color::Green)
-}
-
-pub fn bg_light_black<T: std::fmt::Display>(arg: T) -> String {
-    bg_colored(arg, termion::color::LightBlack)
-}
-
-pub fn bg_light_blue<T: std::fmt::Display>(arg: T) -> String {
-    bg_colored(arg, termion::color::LightBlue)
-}
-
-pub fn bg_light_cyan<T: std::fmt::Display>(arg: T) -> String {
-    bg_colored(arg, termion::color::LightCyan)
-}
-
-pub fn bg_light_green<T: std::fmt::Display>(arg: T) -> String {
-    bg_colored(arg, termion::color::LightGreen)
-}
-
-pub fn bg_light_magenta<T: std::fmt::Display>(arg: T) -> String {
-    bg_colored(arg, termion::color::LightMagenta)
-}
-
-pub fn bg_light_red<T: std::fmt::Display>(arg: T) -> String {
-    bg_colored(arg, termion::color::LightRed)
-}
-
-pub fn bg_light_white<T: std::fmt::Display>(arg: T) -> String {
-    bg_colored(arg, termion::color::LightWhite)
-}
-
-pub fn bg_light_yellow<T: std::fmt::Display>(arg: T) -> String {
-    bg_colored(arg, termion::color::LightYellow)
-}
-
-pub fn bg_magenta<T: std::fmt::Display>(arg: T) -> String {
-    bg_colored(arg, termion::color::Magenta)
-}
-
-pub fn bg_red<T: std::fmt::Display>(arg: T) -> String {
-    bg_colored(arg, termion::color::Red)
-}
-
-pub fn bg_white<T: std::fmt::Display>(arg: T) -> String {
-    bg_colored(arg, termion::color::White)
-}
-
-pub fn bg_yellow<T: std::fmt::Display>(arg: T) -> String {
-    bg_colored(arg, termion::color::Yellow)
-}
-
-pub fn styled<T: std::fmt::Display, S: std::fmt::Display>(arg: T, style: S) -> String {
-    format!("{}{}{}", style, arg, termion::style::Reset)
-}
-
-pub fn bold<T: std::fmt::Display>(arg: T) -> String {
-    styled(arg, termion::style::Bold)
-}
-
-pub fn italic<T: std::fmt::Display>(arg: T) -> String {
-    styled(arg, termion::style::Italic)
-}
-
-pub fn underline<T: std::fmt::Display>(arg: T) -> String {
-    styled(arg, termion::style::Underline)
+pub fn styled<T: std::fmt::Display>(arg: T, style: Style) -> String {
+    match style {
+        Style::Bold => format!("{}{}{}", termion::style::Bold, arg, termion::style::Reset),
+        Style::Faint => format!("{}{}{}", termion::style::Faint, arg, termion::style::Reset),
+        Style::Italic => format!("{}{}{}", termion::style::Italic, arg, termion::style::Reset),
+        Style::Underline => format!(
+            "{}{}{}",
+            termion::style::Underline,
+            arg,
+            termion::style::Reset
+        ),
+        Style::Blink => format!("{}{}{}", termion::style::Blink, arg, termion::style::Reset),
+        Style::Invert => format!("{}{}{}", termion::style::Invert, arg, termion::style::Reset),
+        Style::CrossedOut => format!(
+            "{}{}{}",
+            termion::style::CrossedOut,
+            arg,
+            termion::style::Reset
+        ),
+        Style::Framed => format!("{}{}{}", termion::style::Framed, arg, termion::style::Reset),
+    }
 }
