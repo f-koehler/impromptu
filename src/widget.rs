@@ -8,7 +8,7 @@ enum SizePolicy {
     Expanding,
 }
 
-struct Widget {
+pub struct Widget {
     size_policy: SizePolicy,
     content: String,
     foreground: Option<Color>,
@@ -17,7 +17,7 @@ struct Widget {
 }
 
 impl Widget {
-    fn new() -> Widget {
+    pub fn new() -> Widget {
         Widget {
             size_policy: SizePolicy::Fixed,
             content: String::new(),
@@ -27,17 +27,17 @@ impl Widget {
         }
     }
 
-    fn text(text: String) -> Widget {
+    pub fn text<T: std::fmt::Display>(text: T) -> Widget {
         Widget {
             size_policy: SizePolicy::Fixed,
-            content: text,
+            content: format!("{}", text),
             foreground: None,
             background: None,
             style: None,
         }
     }
 
-    fn space(symbol: String) -> Widget {
+    pub fn spacer(symbol: String) -> Widget {
         Widget {
             size_policy: SizePolicy::Expanding,
             content: symbol,
@@ -47,11 +47,21 @@ impl Widget {
         }
     }
 
-    fn size(&self) -> usize {
+    pub fn size(&self) -> usize {
         self.content.len()
     }
 
-    fn to_string(&self) -> String {
+    pub fn set_foreground(&mut self, color: Color) {
+        self.foreground = Some(color);
+    }
+    pub fn set_background(&mut self, color: Color) {
+        self.background = Some(color);
+    }
+    pub fn set_style(&mut self, style: Style) {
+        self.style = Some(style);
+    }
+
+    pub fn to_string(&self) -> String {
         match self.foreground {
             None => match self.background {
                 None => match self.style {

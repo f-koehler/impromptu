@@ -19,6 +19,7 @@ pub mod widget;
 use style::Color::*;
 use style::Style::*;
 use style::*;
+use widget::Widget;
 
 use clap::{App, Arg};
 use std::string::String;
@@ -44,9 +45,14 @@ fn main() {
         Err(_err) => 1,
         Ok(retval) => retval,
     };
-    let retval_symbol = match retval {
-        0 => colored("✓", Green),
-        _ => colored("✗", Red),
+
+    let mut widget_retval = Widget::text(match retval {
+        0 => "✓",
+        _ => "✗",
+    });
+    match retval {
+        0 => widget_retval.set_foreground(Green),
+        _ => widget_retval.set_foreground(Red),
     };
 
     let job_symbol = match shell::get_shell_jobs(args.value_of("JOBS").unwrap()).len() {
@@ -140,7 +146,7 @@ fn main() {
     );
     print!(
         "{} {}{}{}{} {} {}",
-        retval_symbol,
+        widget_retval.to_string(),
         job_symbol,
         python_text,
         colored(format!("{}@{}:", passwd.username, hostname), Green),
