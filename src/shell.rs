@@ -50,6 +50,16 @@ pub fn get_shell_jobs(arg: &str) -> Vec<ShellJob> {
     result
 }
 
+pub fn parse_retval(matches: &clap::ArgMatches) -> i64 {
+    match matches.value_of("RETVAL") {
+        None => 0i64,
+        Some(m) => match m.parse::<i64>() {
+            Err(_) => 0i64,
+            Ok(retval) => retval,
+        },
+    }
+}
+
 cached! {
     SHELL_NAME;
     fn get_shell_name() -> String = {

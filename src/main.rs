@@ -41,18 +41,17 @@ fn main() {
         )
         .get_matches();
 
-    let retval = match args.value_of("RETVAL").unwrap().parse::<i64>() {
-        Err(_err) => 1,
-        Ok(retval) => retval,
-    };
-
-    let mut widget_retval = Widget::text(match retval {
-        0 => "✓",
-        _ => "✗",
-    });
-    match retval {
-        0 => widget_retval.set_foreground(Green),
-        _ => widget_retval.set_foreground(Red),
+    let widget_retval = match shell::parse_retval(&args) {
+        0 => {
+            let mut w = Widget::text("✓");
+            w.set_foreground(Green);
+            w
+        }
+        _ => {
+            let mut w = Widget::text("✗");
+            w.set_foreground(Red);
+            w
+        }
     };
 
     let job_symbol = match shell::get_shell_jobs(args.value_of("JOBS").unwrap()).len() {
