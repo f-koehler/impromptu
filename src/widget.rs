@@ -3,7 +3,7 @@ use std::string::String;
 
 use super::style::{bg_colored, colored, styled, Color, Style};
 
-enum SizePolicy {
+pub enum SizePolicy {
     Fixed,
     Expanding,
 }
@@ -94,11 +94,11 @@ struct Line {
 }
 
 impl Line {
-    fn add(&mut self, widget: Widget) {
+    pub fn add(&mut self, widget: Widget) {
         self.widgets.push_back(widget);
     }
 
-    fn add_with_separator(&mut self, widget: Widget, separator: String) {
+    pub fn add_with_separator(&mut self, widget: Widget, separator: String) {
         match self.widgets.back() {
             None => self.widgets.push_back(widget),
             Some(last) => {
@@ -120,7 +120,7 @@ impl Line {
         }
     }
 
-    fn add_with_separator_reversed(&mut self, widget: Widget, separator: String) {
+    pub fn add_with_separator_reversed(&mut self, widget: Widget, separator: String) {
         match self.widgets.back() {
             None => self.widgets.push_back(widget),
             Some(last) => {
