@@ -1,10 +1,18 @@
 [package]
 name = "impromptu"
-version = "0.1.0"
+description = " Generate your prompt with an efficient compiled rust program and make it look identical across shells."
+version = "0.0.1"
 authors = ["Fabian Köhler <fkoehler1024@googlemail.com>"]
 default-run = "impromptu"
+edition = "2018"
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/f-koehler/impromptu"
+keywords = ["promp", "shell", "bash", "zsh"]
+categories = ["command-line-utilities"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[badges]
+travis-ci = { repository = "f-koehler/impromptu", branch="master" }
 
 [dependencies]
 cached = "0.9.0"
