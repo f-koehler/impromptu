@@ -1,3 +1,4 @@
+#[derive(Copy, Clone)]
 pub enum Color {
     Black,
     Red,
@@ -17,6 +18,7 @@ pub enum Color {
     LightWhite,
 }
 
+#[derive(Copy, Clone)]
 pub enum Style {
     Bold,
     Faint,
