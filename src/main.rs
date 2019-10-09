@@ -14,6 +14,7 @@ pub mod shell;
 pub mod style;
 pub mod terminal;
 pub mod user;
+pub mod widget;
 
 use style::Color::*;
 use style::Style::*;
