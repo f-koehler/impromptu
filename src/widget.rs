@@ -17,7 +17,7 @@ pub struct Widget {
 }
 
 impl Widget {
-    pub fn new() -> Widget {
+    pub fn new() -> Self {
         Widget {
             size_policy: SizePolicy::Fixed,
             content: String::new(),
@@ -27,7 +27,7 @@ impl Widget {
         }
     }
 
-    pub fn text<T: std::fmt::Display>(text: T) -> Widget {
+    pub fn text<T: std::fmt::Display>(text: T) -> Self {
         Widget {
             size_policy: SizePolicy::Fixed,
             content: format!("{}", text),
@@ -37,7 +37,7 @@ impl Widget {
         }
     }
 
-    pub fn spacer(symbol: String) -> Widget {
+    pub fn spacer(symbol: String) -> Self {
         Widget {
             size_policy: SizePolicy::Expanding,
             content: symbol,
@@ -51,14 +51,17 @@ impl Widget {
         self.content.len()
     }
 
-    pub fn set_foreground(&mut self, color: Color) {
+    pub fn set_foreground(mut self, color: Color) -> Self {
         self.foreground = Some(color);
+        self
     }
-    pub fn set_background(&mut self, color: Color) {
+    pub fn set_background(mut self, color: Color) -> Self {
         self.background = Some(color);
+        self
     }
-    pub fn set_style(&mut self, style: Style) {
+    pub fn set_style(mut self, style: Style) -> Self {
         self.style = Some(style);
+        self
     }
 
     pub fn to_string(&self) -> String {

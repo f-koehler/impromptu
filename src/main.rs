@@ -42,21 +42,13 @@ fn main() {
         .get_matches();
 
     let widget_retval = match shell::parse_retval(&args) {
-        0 => {
-            let mut w = Widget::text("✓");
-            w.set_foreground(Green);
-            w
-        }
-        _ => {
-            let mut w = Widget::text("✗");
-            w.set_foreground(Red);
-            w
-        }
+        0 => Widget::text("✓").set_foreground(Green),
+        _ => Widget::text("✗").set_foreground(Red),
     };
 
-    let job_symbol = match shell::get_shell_jobs(args.value_of("JOBS").unwrap()).len() {
-        0 => format!(""),
-        _ => colored("⚙ ", Cyan),
+    let widget_jobs = match shell::get_shell_jobs(args.value_of("JOBS").unwrap()).len() {
+        0 => Widget::text(""),
+        _ => Widget::text("⚙ ").set_foreground(Cyan),
     };
 
     let (width, _) = terminal::get_terminal_size();
@@ -146,7 +138,7 @@ fn main() {
     print!(
         "{} {}{}{}{} {} {}",
         widget_retval.to_string(),
-        job_symbol,
+        widget_jobs.to_string(),
         python_text,
         colored(format!("{}@{}:", passwd.username, hostname), Green),
         cwd_text,
