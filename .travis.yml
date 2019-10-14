@@ -1,8 +1,11 @@
 language: rust
+arch:
+  - amd64
+  - arm64
 rust:
-  - stable
   - beta
   - nightly
+  - stable
 matrix:
   allow_failures:
     - rust: nightly
