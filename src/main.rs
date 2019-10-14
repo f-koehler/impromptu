@@ -41,38 +41,46 @@ fn main() {
         )
         .get_matches();
 
-    let widget_retval = match shell::parse_retval(&args) {
+    let passwd = user::get_passwd();
+
+    let mut line1 = std::vec::Vec::new();
+    line1.push(Widget::text(shell::get_shell_name()).set_foreground(Yellow));
+    line1.push(Widget::spacer("─".to_string()).set_foreground(Yellow));
+    line1.push(Widget::text(chrono::Local::now().format("%H:%M:%S")).set_foreground(Yellow));
+
+    let mut line2 = std::vec::Vec::new();
+    line2.push(match shell::parse_retval(&args) {
         0 => Widget::text("✓").set_foreground(Green),
         _ => Widget::text("✗").set_foreground(Red),
-    };
-
-    let widget_jobs = match shell::get_shell_jobs(args.value_of("JOBS").unwrap()).len() {
-        0 => Widget::text(""),
-        _ => Widget::text("⚙ ").set_foreground(Cyan),
-    };
+    });
+    line2.push(
+        match shell::get_shell_jobs(args.value_of("JOBS").unwrap()).len() {
+            0 => Widget::text(""),
+            _ => Widget::text("⚙ ").set_foreground(Cyan),
+        },
+    );
+    line2.push(match python::get_virtual_env_name() {
+        None => Widget::new(),
+        Some(venv) => Widget::text(format!("[py: {}] ", venv)),
+    });
+    line2.push(Widget::text(passwd.username).set_foreground(Green));
+    line2.push(Widget::text("@".to_string()).set_foreground(Green));
+    line2.push(Widget::text(hostname::get_hostname()).set_foreground(Green));
+    line2.push(Widget::text(":").set_foreground(Green));
+    line2.push(
+        Widget::text(shell::shorten_path(shell::get_cwd(), passwd.home_directory).display())
+            .set_foreground(Red)
+            .set_style(Bold),
+    );
 
     let (width, _) = terminal::get_terminal_size();
 
-    let time = format!("{}", chrono::Local::now().format("%H:%M:%S"));
-    let shell = shell::get_shell_name();
-    let line = match width {
-        0u16 => "".to_string(),
-        _ => std::iter::repeat("─")
-            .take(width as usize - time.len() - shell.len() - 1)
-            .collect::<String>(),
-    };
-
-    let hostname = hostname::get_hostname();
-
-    let passwd = user::get_passwd();
-
-    let cwd_text = styled(
-        colored(
-            shell::shorten_path(shell::get_cwd(), passwd.home_directory).display(),
-            Red,
-        ),
-        Bold,
-    );
+    // let line = match width {
+    //     0u16 => "".to_string(),
+    //     _ => std::iter::repeat("─")
+    //         .take(width as usize - time.len() - shell.len() - 1)
+    //         .collect::<String>(),
+    // };
 
     let mut git_text = String::new();
     match git::get_git_repo(shell::get_cwd()) {
@@ -121,28 +129,31 @@ fn main() {
         }
     }
 
-    let prompt_symbol = match user::is_root() {
-        true => styled(colored("#", Red), Bold),
-        false => styled(colored("$", Green), Bold),
+    let widget_symbol = match user::is_root() {
+        true => Widget::text("#").set_foreground(Red),
+        false => Widget::text("$").set_foreground(Green),
     };
 
-    let python_text = match python::get_virtual_env_name() {
-        None => String::new(),
-        Some(venv) => format!("[py: {}] ", venv),
-    };
+    for widget in line1 {
+        print!("{}", widget.to_string());
+    }
+    println!("");
+    for widget in line2 {
+        print!("{}", widget.to_string());
+    }
 
-    println!(
-        "{}",
-        colored(format!("{} {} {}", shell, line, time), Yellow)
-    );
-    print!(
-        "{} {}{}{}{} {} {}",
-        widget_retval.to_string(),
-        widget_jobs.to_string(),
-        python_text,
-        colored(format!("{}@{}:", passwd.username, hostname), Green),
-        cwd_text,
-        git_text,
-        prompt_symbol
-    );
+    // println!(
+    //     "{}",
+    //     colored(format!("{} {} {}", shell, line, time), Yellow)
+    // );
+    // print!(
+    //     "{} {}{}{}{} {} {}",
+    //     widget_retval.to_string(),
+    //     widget_jobs.to_string(),
+    //     python_text,
+    //     colored(format!("{}@{}:", passwd.username, hostname), Green),
+    //     cwd_text,
+    //     git_text,
+    //     widget_symbol.to_string()
+    // );
 }
